@@ -179,6 +179,9 @@ function Level2({
   const [placedTerms, setPlacedTerms] =
     useState({});
 
+  const [selectedTerm, setSelectedTerm] =
+    useState(null);
+
   const [shuffledTerms, setShuffledTerms] =
     useState(() => shuffleArray(terms));
 
@@ -192,23 +195,36 @@ function Level2({
   =========================================================
   DRAG AUTO-SCROLL
   =========================================================
-  The Level 2 game area itself scrolls while an answer is
-  being dragged near the top or bottom edge.
+  This is mainly useful on computers.
+  Phones use tap-to-place instead.
   */
 
   const gameAreaRef = useRef(null);
+
   const dragScrollRef = useRef(null);
+
   const dragMouseYRef = useRef(null);
 
   useEffect(() => {
     const handleDragOver = (event) => {
-      if (!gameAreaRef.current || lives <= 0) return;
+      if (
+        !gameAreaRef.current ||
+        lives <= 0
+      ) {
+        return;
+      }
 
-      dragMouseYRef.current = event.clientY;
+      dragMouseYRef.current =
+        event.clientY;
 
-      const gameArea = gameAreaRef.current;
-      const rect = gameArea.getBoundingClientRect();
+      const gameArea =
+        gameAreaRef.current;
+
+      const rect =
+        gameArea.getBoundingClientRect();
+
       const edgeSize = 110;
+
       const scrollSpeed = 10;
 
       const distanceFromTop =
@@ -240,14 +256,17 @@ function Level2({
             !gameAreaRef.current ||
             dragMouseYRef.current === null
           ) {
-            dragScrollRef.current = null;
+            dragScrollRef.current =
+              null;
+
             return;
           }
 
           const currentRect =
             gameAreaRef.current.getBoundingClientRect();
 
-          const y = dragMouseYRef.current;
+          const y =
+            dragMouseYRef.current;
 
           const topDistance =
             y - currentRect.top;
@@ -269,14 +288,20 @@ function Level2({
             currentDirection = 1;
           }
 
-          if (currentDirection !== 0) {
+          if (
+            currentDirection !== 0
+          ) {
             gameAreaRef.current.scrollTop +=
-              currentDirection * scrollSpeed;
+              currentDirection *
+              scrollSpeed;
 
             dragScrollRef.current =
-              requestAnimationFrame(scroll);
+              requestAnimationFrame(
+                scroll
+              );
           } else {
-            dragScrollRef.current = null;
+            dragScrollRef.current =
+              null;
           }
         };
 
@@ -290,19 +315,22 @@ function Level2({
           dragScrollRef.current
         );
 
-        dragScrollRef.current = null;
+        dragScrollRef.current =
+          null;
       }
     };
 
     const stopDragScroll = () => {
-      dragMouseYRef.current = null;
+      dragMouseYRef.current =
+        null;
 
       if (dragScrollRef.current) {
         cancelAnimationFrame(
           dragScrollRef.current
         );
 
-        dragScrollRef.current = null;
+        dragScrollRef.current =
+          null;
       }
     };
 
@@ -614,6 +642,8 @@ function Level2({
 
     setPlacedTerms({});
 
+    setSelectedTerm(null);
+
     setDropFeedback(null);
 
     setShuffledTerms(
@@ -623,7 +653,7 @@ function Level2({
 
   /*
   =========================================================
-  DRAG START
+  DESKTOP DRAG START
   =========================================================
   */
 
@@ -642,6 +672,41 @@ function Level2({
 
     event.dataTransfer.effectAllowed =
       "move";
+
+    setSelectedTerm(termId);
+  }
+
+  /*
+  =========================================================
+  MOBILE TAP SELECTION
+  =========================================================
+  */
+
+  function handleTermClick(termId) {
+    if (lives <= 0) {
+      return;
+    }
+
+    const alreadyPlaced =
+      Object.values(
+        placedTerms
+      ).includes(termId);
+
+    if (alreadyPlaced) {
+      return;
+    }
+
+    setSelectedTerm(termId);
+
+    setDropFeedback({
+      type: "correct",
+      message:
+        "Answer selected! Now tap the space where it belongs.",
+    });
+
+    setTimeout(() => {
+      setDropFeedback(null);
+    }, 1500);
   }
 
   /*
@@ -663,16 +728,14 @@ function Level2({
 
   /*
   =========================================================
-  DROP
+  HANDLE ANSWER
   =========================================================
   */
 
-  function handleDrop(
-    event,
+  function placeTerm(
+    termId,
     index
   ) {
-    event.preventDefault();
-
     if (lives <= 0) {
       return;
     }
@@ -680,11 +743,6 @@ function Level2({
     if (placedTerms[index]) {
       return;
     }
-
-    const termId =
-      event.dataTransfer.getData(
-        "termId"
-      );
 
     const term = terms.find(
       (item) =>
@@ -714,6 +772,8 @@ function Level2({
           previous + 1
       );
 
+      setSelectedTerm(null);
+
       setDropFeedback({
         type: "correct",
         message:
@@ -737,6 +797,8 @@ function Level2({
 
       setLives(newLives);
 
+      setSelectedTerm(null);
+
       setDropFeedback({
         type: "wrong",
         message:
@@ -753,6 +815,68 @@ function Level2({
         }, 1000);
       }
     }
+  }
+
+  /*
+  =========================================================
+  DESKTOP DROP
+  =========================================================
+  */
+
+  function handleDrop(
+    event,
+    index
+  ) {
+    event.preventDefault();
+
+    const termId =
+      event.dataTransfer.getData(
+        "termId"
+      );
+
+    if (!termId) {
+      return;
+    }
+
+    placeTerm(
+      termId,
+      index
+    );
+  }
+
+  /*
+  =========================================================
+  MOBILE TAP DROP
+  =========================================================
+  */
+
+  function handleTapDrop(index) {
+    if (lives <= 0) {
+      return;
+    }
+
+    if (placedTerms[index]) {
+      return;
+    }
+
+    if (!selectedTerm) {
+      setDropFeedback({
+        type: "wrong",
+        message:
+          "Tap an answer first, then tap a space.",
+      });
+
+      setTimeout(() => {
+        setDropFeedback(null);
+      }, 1500);
+
+      return;
+    }
+
+    placeTerm(
+      selectedTerm,
+      index
+    );
   }
 
   /*
@@ -795,6 +919,8 @@ function Level2({
     setScore(0);
 
     setPlacedTerms({});
+
+    setSelectedTerm(null);
 
     setDropFeedback(null);
 
@@ -992,9 +1118,16 @@ function Level2({
           </h1>
 
           <p>
-            Glucose is already in place.
-            Drag the remaining terms into
-            the correct order.
+            <strong>
+              📱 Phone:
+            </strong>{" "}
+            Tap an answer, then tap the space
+            where it belongs.
+            <br />
+            <strong>
+              💻 Computer:
+            </strong>{" "}
+            You can drag the answers.
           </p>
 
           <div className="recall-stats">
@@ -1066,7 +1199,7 @@ function Level2({
         >
 
           {/* =================================================
-              TERM BANK / GAME PANEL
+              TERM BANK
           ================================================= */}
 
           <section
@@ -1079,12 +1212,12 @@ function Level2({
           >
 
             <h2>
-              Drag the Terms
+              Choose an Answer
             </h2>
 
             <p>
-              Answers are shuffled.
-              Think carefully.
+              Tap an answer first, then tap
+              the matching space.
             </p>
 
             <div className="terms">
@@ -1102,15 +1235,23 @@ function Level2({
                   return (
                     <div
                       key={term.id}
+
                       className={`draggable-term ${
                         alreadyPlaced
                           ? "term-used"
                           : ""
+                      } ${
+                        selectedTerm ===
+                        term.id
+                          ? "term-selected"
+                          : ""
                       }`}
+
                       draggable={
                         !alreadyPlaced &&
                         lives > 0
                       }
+
                       onDragStart={(
                         event
                       ) =>
@@ -1119,8 +1260,29 @@ function Level2({
                           term.id
                         )
                       }
+
+                      onClick={() =>
+                        handleTermClick(
+                          term.id
+                        )
+                      }
+
+                      role="button"
+
+                      tabIndex={
+                        alreadyPlaced
+                          ? -1
+                          : 0
+                      }
+
+                      aria-pressed={
+                        selectedTerm ===
+                        term.id
+                      }
                     >
+
                       {term.label}
+
                     </div>
                   );
                 }
@@ -1131,7 +1293,7 @@ function Level2({
           </section>
 
           {/* =================================================
-              ANSWER / PATHWAY PANEL
+              PATHWAY
           ================================================= */}
 
           <section
@@ -1181,26 +1343,51 @@ function Level2({
                         placedTerm
                           ? "drop-zone-filled"
                           : ""
+                      } ${
+                        selectedTerm &&
+                        !placedTerm
+                          ? "drop-zone-ready"
+                          : ""
                       }`}
+
                       onDragOver={
                         allowDrop
                       }
+
                       onDrop={(event) =>
                         handleDrop(
                           event,
                           index
                         )
                       }
+
+                      onClick={() =>
+                        handleTapDrop(
+                          index
+                        )
+                      }
+
+                      role="button"
+
+                      tabIndex={0}
                     >
 
                       {placedTerm ? (
+
                         <span className="placed-term">
                           {placedTerm.label}
                         </span>
+
                       ) : (
+
                         <span className="drop-placeholder">
-                          Drop answer here
+
+                          {selectedTerm
+                            ? "Tap here to place selected answer"
+                            : "Tap an answer first"}
+
                         </span>
+
                       )}
 
                     </div>
@@ -1249,7 +1436,7 @@ function Level2({
             </div>
 
             <p className="recall-tip">
-              💡 Tip: There are two ATP
+              💡 There are two ATP
               investments. Think about which
               enzyme acts before each one.
             </p>
