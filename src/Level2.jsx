@@ -2,152 +2,144 @@ import { useState, useRef, useEffect } from "react";
 
 const terms = [
   {
-    id: "g3p",
-    label: "G3P",
+    id: "hexokinase",
+    label: "Hexokinase",
     correct: 0,
-  },
-  {
-    id: "nad",
-    label: "NAD⁺",
-    correct: 1,
-  },
-  {
-    id: "nadh",
-    label: "NADH",
-    correct: 2,
-  },
-  {
-    id: "bpg",
-    label: "1,3-Bisphosphoglycerate",
-    correct: 3,
   },
   {
     id: "atp1",
     label: "ATP",
+    correct: 1,
+  },
+  {
+    id: "g6p",
+    label: "Glucose-6-phosphate",
+    correct: 2,
+  },
+  {
+    id: "phosphoglucoseIsomerase",
+    label: "Phosphoglucose isomerase",
+    correct: 3,
+  },
+  {
+    id: "f6p",
+    label: "Fructose-6-phosphate",
     correct: 4,
   },
   {
-    id: "threepg",
-    label: "3-Phosphoglycerate",
+    id: "pfk1",
+    label: "Phosphofructokinase-1 (PFK-1)",
     correct: 5,
-  },
-  {
-    id: "twopg",
-    label: "2-Phosphoglycerate",
-    correct: 6,
-  },
-  {
-    id: "pep",
-    label: "Phosphoenolpyruvate (PEP)",
-    correct: 7,
   },
   {
     id: "atp2",
     label: "ATP",
-    correct: 8,
+    correct: 6,
   },
   {
-    id: "pyruvate",
-    label: "Pyruvate",
-    correct: 9,
+    id: "f16bp",
+    label: "Fructose-1,6-bisphosphate",
+    correct: 7,
   },
 ];
 
 const pathway = [
   {
-    title: "G3P",
+    title: "Hexokinase",
     description:
-      "A three-carbon molecule enters the payoff phase.",
-  },
-  {
-    title: "NAD⁺",
-    description:
-      "Accepts electrons during oxidation of G3P.",
-  },
-  {
-    title: "NADH",
-    description:
-      "Reduced electron carrier is produced.",
-  },
-  {
-    title: "1,3-Bisphosphoglycerate",
-    description:
-      "A high-energy intermediate is formed.",
+      "Catalyzes phosphorylation of glucose at the beginning of glycolysis.",
   },
   {
     title: "ATP",
     description:
-      "ATP is formed by substrate-level phosphorylation.",
+      "Provides the phosphate group for the first energy-investment reaction.",
   },
   {
-    title: "3-Phosphoglycerate",
+    title: "Glucose-6-phosphate",
     description:
-      "The phosphate is transferred away from the high-energy intermediate.",
+      "The product formed after glucose is phosphorylated.",
   },
   {
-    title: "2-Phosphoglycerate",
+    title: "Phosphoglucose isomerase",
     description:
-      "The phosphate group changes position.",
+      "Catalyzes the rearrangement of glucose-6-phosphate to fructose-6-phosphate.",
   },
   {
-    title: "Phosphoenolpyruvate (PEP)",
+    title: "Fructose-6-phosphate",
     description:
-      "A very high-energy intermediate is produced.",
+      "The six-carbon sugar phosphate that is phosphorylated in the next energy-investment step.",
+  },
+  {
+    title: "Phosphofructokinase-1 (PFK-1)",
+    description:
+      "Catalyzes the second phosphorylation reaction of glycolysis.",
   },
   {
     title: "ATP",
     description:
-      "Another ATP is produced by substrate-level phosphorylation.",
+      "Provides the phosphate group for the second energy-investment reaction.",
   },
   {
-    title: "Pyruvate",
+    title: "Fructose-1,6-bisphosphate",
     description:
-      "The final product of glycolysis is formed.",
+      "The end product of this energy-investment stage and the molecule that will be split in the next stage.",
   },
 ];
 
 const flashcards = [
   {
     question:
-      "What happens to G3P during the payoff phase?",
+      "What is the starting molecule of glycolysis?",
     answer:
-      "G3P is oxidized and phosphorylated, producing 1,3-bisphosphoglycerate and NADH.",
+      "Glucose.",
   },
   {
     question:
-      "What electron carrier is reduced during glycolysis?",
+      "Which enzyme catalyzes the first step of glycolysis?",
     answer:
-      "NAD⁺ accepts electrons and is reduced to NADH.",
+      "Hexokinase phosphorylates glucose to form glucose-6-phosphate.",
   },
   {
     question:
-      "How is ATP produced during the payoff phase?",
+      "What does ATP do in the first phosphorylation step?",
     answer:
-      "ATP is produced by substrate-level phosphorylation.",
+      "ATP donates a phosphate group to glucose and is converted to ADP.",
   },
   {
     question:
-      "What happens to 3-phosphoglycerate?",
+      "What is glucose-6-phosphate converted into?",
     answer:
-      "Its phosphate group is rearranged, producing 2-phosphoglycerate.",
+      "Glucose-6-phosphate is rearranged into fructose-6-phosphate by phosphoglucose isomerase.",
   },
   {
     question:
-      "Why is PEP important?",
+      "Which enzyme catalyzes the second phosphorylation step?",
     answer:
-      "PEP contains a high-energy phosphate bond that can be used to produce ATP.",
+      "Phosphofructokinase-1 (PFK-1).",
   },
   {
     question:
-      "What is the final product of glycolysis?",
+      "What molecule provides the phosphate in the PFK-1 reaction?",
     answer:
-      "Pyruvate.",
+      "ATP provides the phosphate group and is converted to ADP.",
   },
   {
     question:
-      "What is the net ATP yield of glycolysis per glucose molecule?",
+      "What is the final product of the energy-investment phase?",
     answer:
-      "Glycolysis produces 4 ATP but uses 2 ATP, giving a net gain of 2 ATP.",
+      "Fructose-1,6-bisphosphate.",
+  },
+  {
+    question:
+      "How many ATP molecules are invested before fructose-1,6-bisphosphate is formed?",
+    answer:
+      "Two ATP molecules are invested: one during the hexokinase step and one during the PFK-1 step.",
+  },
+  {
+    question:
+      "What happens to fructose-1,6-bisphosphate next?",
+    answer:
+      "It is ready to be split into two three-carbon molecules in the next stage of glycolysis.",
   },
 ];
 
@@ -219,68 +211,132 @@ function Level2({
       const edgeSize = 110;
       const scrollSpeed = 10;
 
-      const distanceFromTop = event.clientY - rect.top;
-      const distanceFromBottom = rect.bottom - event.clientY;
+      const distanceFromTop =
+        event.clientY - rect.top;
+
+      const distanceFromBottom =
+        rect.bottom - event.clientY;
 
       let direction = 0;
 
-      if (distanceFromTop >= 0 && distanceFromTop < edgeSize) {
+      if (
+        distanceFromTop >= 0 &&
+        distanceFromTop < edgeSize
+      ) {
         direction = -1;
-      } else if (distanceFromBottom >= 0 && distanceFromBottom < edgeSize) {
+      } else if (
+        distanceFromBottom >= 0 &&
+        distanceFromBottom < edgeSize
+      ) {
         direction = 1;
       }
 
-      if (direction !== 0 && !dragScrollRef.current) {
+      if (
+        direction !== 0 &&
+        !dragScrollRef.current
+      ) {
         const scroll = () => {
-          if (!gameAreaRef.current || dragMouseYRef.current === null) {
+          if (
+            !gameAreaRef.current ||
+            dragMouseYRef.current === null
+          ) {
             dragScrollRef.current = null;
             return;
           }
 
-          const currentRect = gameAreaRef.current.getBoundingClientRect();
+          const currentRect =
+            gameAreaRef.current.getBoundingClientRect();
+
           const y = dragMouseYRef.current;
-          const topDistance = y - currentRect.top;
-          const bottomDistance = currentRect.bottom - y;
+
+          const topDistance =
+            y - currentRect.top;
+
+          const bottomDistance =
+            currentRect.bottom - y;
 
           let currentDirection = 0;
 
-          if (topDistance >= 0 && topDistance < edgeSize) {
+          if (
+            topDistance >= 0 &&
+            topDistance < edgeSize
+          ) {
             currentDirection = -1;
-          } else if (bottomDistance >= 0 && bottomDistance < edgeSize) {
+          } else if (
+            bottomDistance >= 0 &&
+            bottomDistance < edgeSize
+          ) {
             currentDirection = 1;
           }
 
           if (currentDirection !== 0) {
-            gameAreaRef.current.scrollTop += currentDirection * scrollSpeed;
-            dragScrollRef.current = requestAnimationFrame(scroll);
+            gameAreaRef.current.scrollTop +=
+              currentDirection * scrollSpeed;
+
+            dragScrollRef.current =
+              requestAnimationFrame(scroll);
           } else {
             dragScrollRef.current = null;
           }
         };
 
-        dragScrollRef.current = requestAnimationFrame(scroll);
-      } else if (direction === 0 && dragScrollRef.current) {
-        cancelAnimationFrame(dragScrollRef.current);
+        dragScrollRef.current =
+          requestAnimationFrame(scroll);
+      } else if (
+        direction === 0 &&
+        dragScrollRef.current
+      ) {
+        cancelAnimationFrame(
+          dragScrollRef.current
+        );
+
         dragScrollRef.current = null;
       }
     };
 
     const stopDragScroll = () => {
       dragMouseYRef.current = null;
+
       if (dragScrollRef.current) {
-        cancelAnimationFrame(dragScrollRef.current);
+        cancelAnimationFrame(
+          dragScrollRef.current
+        );
+
         dragScrollRef.current = null;
       }
     };
 
-    document.addEventListener("dragover", handleDragOver);
-    document.addEventListener("dragend", stopDragScroll);
-    document.addEventListener("drop", stopDragScroll);
+    document.addEventListener(
+      "dragover",
+      handleDragOver
+    );
+
+    document.addEventListener(
+      "dragend",
+      stopDragScroll
+    );
+
+    document.addEventListener(
+      "drop",
+      stopDragScroll
+    );
 
     return () => {
-      document.removeEventListener("dragover", handleDragOver);
-      document.removeEventListener("dragend", stopDragScroll);
-      document.removeEventListener("drop", stopDragScroll);
+      document.removeEventListener(
+        "dragover",
+        handleDragOver
+      );
+
+      document.removeEventListener(
+        "dragend",
+        stopDragScroll
+      );
+
+      document.removeEventListener(
+        "drop",
+        stopDragScroll
+      );
+
       stopDragScroll();
     };
   }, [lives]);
@@ -293,32 +349,27 @@ function Level2({
 
   const lessonSections = [
     {
-      title: "The Energy Payoff Begins",
+      title:
+        "Glucose Starts Glycolysis",
 
       content: (
         <>
           <p>
-            The first half of glycolysis used ATP
-            to prepare glucose for breakdown.
+            Glycolysis begins with
+            <strong> glucose</strong>, a
+            six-carbon sugar.
           </p>
 
           <p>
-            Now the second half begins. This is
-            called the
-            <strong> energy payoff phase</strong>.
-          </p>
-
-          <p>
-            Remember that the original glucose
-            molecule was split into two
-            three-carbon molecules.
+            Before glucose can be broken down
+            later in the pathway, the cell first
+            invests energy to prepare it.
           </p>
 
           <div className="lesson-highlight">
             <strong>
-              From this point onward, every reaction
-              happens twice for every glucose
-              molecule.
+              Glucose is the starting molecule
+              of glycolysis.
             </strong>
           </div>
         </>
@@ -326,124 +377,77 @@ function Level2({
     },
 
     {
-      title: "G3P Is Oxidized",
+      title:
+        "Hexokinase Acts on Glucose",
 
       content: (
         <>
           <p>
-            Each glyceraldehyde-3-phosphate (G3P)
-            molecule is oxidized.
+            The first reaction is catalyzed by
+            the enzyme
+            <strong> hexokinase</strong>.
           </p>
 
           <p>
-            During this reaction,
-            <strong> NAD⁺</strong> accepts
-            electrons and hydrogen.
-          </p>
-
-          <p>
-            NAD⁺ is therefore reduced to
-            <strong> NADH</strong>.
+            Hexokinase transfers a phosphate
+            group to glucose. This is called
+            phosphorylation.
           </p>
 
           <div className="lesson-flow">
-            G3P → NADH +
-            1,3-Bisphosphoglycerate
-          </div>
-
-          <p>
-            This is an important oxidation-reduction
-            step because the electrons captured by
-            NADH can later contribute to ATP
-            production.
-          </p>
-        </>
-      ),
-    },
-
-    {
-      title: "The First ATP Is Made",
-
-      content: (
-        <>
-          <p>
-            1,3-Bisphosphoglycerate contains a
-            high-energy phosphate group.
-          </p>
-
-          <p>
-            That phosphate can be transferred to
-            ADP to produce ATP.
-          </p>
-
-          <div className="lesson-highlight">
-            <strong>
-              This is called substrate-level
-              phosphorylation.
-            </strong>
-          </div>
-
-          <p>
-            The product is
-            <strong> 3-phosphoglycerate</strong>.
-          </p>
-
-          <div className="lesson-flow">
-            1,3-BPG → 3-Phosphoglycerate + ATP
-          </div>
-        </>
-      ),
-    },
-
-    {
-      title: "The Phosphate Changes Position",
-
-      content: (
-        <>
-          <p>
-            3-phosphoglycerate is converted into
-            <strong> 2-phosphoglycerate</strong>.
-          </p>
-
-          <p>
-            The phosphate group changes position
-            within the three-carbon molecule.
-          </p>
-
-          <div className="lesson-flow">
-            3-Phosphoglycerate
+            Glucose + ATP
             <br />
             ↓
             <br />
-            2-Phosphoglycerate
+            Glucose-6-phosphate + ADP
           </div>
+
+          <p>
+            This first phosphorylation uses one
+            ATP molecule.
+          </p>
         </>
       ),
     },
 
     {
-      title: "PEP Is Formed",
+      title:
+        "Glucose-6-phosphate Is Rearranged",
 
       content: (
         <>
           <p>
-            2-phosphoglycerate is converted into
+            Glucose-6-phosphate is then
+            rearranged into
             <strong>
-              phosphoenolpyruvate (PEP)
+              {" "}
+              fructose-6-phosphate
             </strong>
             .
           </p>
 
           <p>
-            This reaction removes water and
-            produces a very high-energy phosphate
-            compound.
+            The enzyme responsible for this
+            rearrangement is
+            <strong>
+              {" "}
+              phosphoglucose isomerase
+            </strong>
+            .
           </p>
+
+          <div className="lesson-flow">
+            Glucose-6-phosphate
+            <br />
+            ↓
+            <br />
+            Fructose-6-phosphate
+          </div>
 
           <div className="lesson-highlight">
             <strong>
-              PEP has a very high phosphoryl-transfer
-              potential.
+              No second ATP is used during this
+              rearrangement step.
             </strong>
           </div>
         </>
@@ -451,65 +455,118 @@ function Level2({
     },
 
     {
-      title: "The Second ATP and Pyruvate",
+      title:
+        "PFK-1 Acts on Fructose-6-phosphate",
 
       content: (
         <>
           <p>
-            PEP transfers its phosphate group to
-            ADP.
+            The next major energy-investment
+            step is catalyzed by
+            <strong>
+              {" "}
+              phosphofructokinase-1 (PFK-1)
+            </strong>
+            .
           </p>
 
           <p>
-            This produces another ATP and forms
-            <strong> pyruvate</strong>.
+            PFK-1 transfers another phosphate
+            group to fructose-6-phosphate.
           </p>
 
           <div className="lesson-flow">
-            PEP → Pyruvate + ATP
+            Fructose-6-phosphate + ATP
+            <br />
+            ↓
+            <br />
+            Fructose-1,6-bisphosphate + ADP
           </div>
 
           <p>
-            Because two molecules of G3P entered
-            this phase, these reactions occur
-            twice.
+            This is the second ATP investment
+            in glycolysis.
           </p>
         </>
       ),
     },
 
     {
-      title: "The Overall Payoff",
+      title:
+        "Fructose-1,6-bisphosphate Is Formed",
 
       content: (
         <>
           <p>
-            The payoff phase produces ATP and NADH
-            while converting the two three-carbon
-            molecules into pyruvate.
+            After the second phosphorylation,
+            the pathway has formed
+            <strong>
+              {" "}
+              fructose-1,6-bisphosphate
+            </strong>
+            .
           </p>
 
           <div className="lesson-highlight">
-            <p>Per glucose:</p>
-
-            <strong>2 NADH</strong>
-
-            <br />
-
-            <strong>4 ATP produced</strong>
-
-            <br />
-
-            <strong>2 Pyruvate</strong>
+            <strong>
+              Fructose-1,6-bisphosphate is the
+              end product of this
+              energy-investment stage.
+            </strong>
           </div>
 
           <p>
-            Since 2 ATP were already invested
-            during the first phase, glycolysis gives
-            a
-            <strong> net gain of 2 ATP</strong>{" "}
-            per glucose.
+            Two ATP molecules have been invested
+            so far: one during the hexokinase
+            reaction and one during the PFK-1
+            reaction.
           </p>
+
+          <p>
+            The molecule is now prepared for
+            the next stage, where it will be
+            split into two three-carbon
+            molecules.
+          </p>
+        </>
+      ),
+    },
+
+    {
+      title:
+        "The Whole Energy-Investment Pathway",
+
+      content: (
+        <>
+          <p>
+            Put the main steps together:
+          </p>
+
+          <div className="lesson-flow">
+            Glucose
+            <br />
+            ↓ Hexokinase + ATP
+            <br />
+            Glucose-6-phosphate
+            <br />
+            ↓ Phosphoglucose isomerase
+            <br />
+            Fructose-6-phosphate
+            <br />
+            ↓ PFK-1 + ATP
+            <br />
+            <strong>
+              Fructose-1,6-bisphosphate
+            </strong>
+          </div>
+
+          <div className="lesson-highlight">
+            <strong>
+              2 ATP are invested before
+              fructose-1,6-bisphosphate is
+              formed.
+            </strong>
+          </div>
         </>
       ),
     },
@@ -568,12 +625,6 @@ function Level2({
   =========================================================
   DRAG START
   =========================================================
-
-  IMPORTANT:
-  There is NO automatic scrolling here.
-
-  The user can freely scroll the page while
-  working through the pathway.
   */
 
   function handleDragStart(
@@ -689,7 +740,7 @@ function Level2({
       setDropFeedback({
         type: "wrong",
         message:
-          "Wrong! That step does not belong here.",
+          "Not quite. Think about the order of the energy-investment steps.",
       });
 
       setTimeout(() => {
@@ -829,12 +880,14 @@ function Level2({
           </span>
 
           <h1>
-            Energy Payoff
+            Glucose →
+            Fructose-1,6-bisphosphate
           </h1>
 
           <p>
-            Turn the energy stored in glucose
-            into ATP.
+            Follow the energy-investment phase
+            of glycolysis from glucose to
+            fructose-1,6-bisphosphate.
           </p>
 
         </div>
@@ -935,12 +988,13 @@ function Level2({
           </span>
 
           <h1>
-            Build the Energy Payoff
+            Build the Energy-Investment Phase
           </h1>
 
           <p>
-            Drag each item into its correct
-            position.
+            Glucose is already in place.
+            Drag the remaining terms into
+            the correct order.
           </p>
 
           <div className="recall-stats">
@@ -1006,7 +1060,8 @@ function Level2({
             maxHeight: "75vh",
             overflowY: "auto",
             overflowX: "hidden",
-            WebkitOverflowScrolling: "touch",
+            WebkitOverflowScrolling:
+              "touch",
           }}
         >
 
@@ -1089,11 +1144,13 @@ function Level2({
           >
 
             <h2 className="pathway-title">
-              Glycolysis Energy Payoff
+              Glycolysis — Energy Investment
             </h2>
 
+            {/* FIXED STARTING MOLECULE */}
+
             <div className="pathway-start">
-              TWO G3P MOLECULES
+              GLUCOSE
             </div>
 
             {pathway.map(
@@ -1149,7 +1206,15 @@ function Level2({
                     </div>
 
                     <div className="pathway-description">
+
+                      <strong>
+                        {step.title}
+                      </strong>
+
+                      <br />
+
                       {step.description}
+
                     </div>
 
                   </div>
@@ -1161,8 +1226,10 @@ function Level2({
               ↓
             </div>
 
+            {/* FIXED END PRODUCT */}
+
             <div className="pathway-finish">
-              2 PYRUVATE
+              FRUCTOSE-1,6-BISPHOSPHATE
             </div>
 
             <div className="recall-controls">
@@ -1182,9 +1249,9 @@ function Level2({
             </div>
 
             <p className="recall-tip">
-              💡 Tip: Think about oxidation,
-              phosphorylation and
-              substrate-level phosphorylation.
+              💡 Tip: There are two ATP
+              investments. Think about which
+              enzyme acts before each one.
             </p>
 
           </section>
@@ -1232,17 +1299,19 @@ function Level2({
               </span>
 
               <h1>
-                Energy Payoff Mastered!
+                Energy Investment Mastered!
               </h1>
 
               <p>
-                Excellent work. You successfully
-                built the payoff phase of glycolysis.
+                Excellent work. You followed
+                glycolysis from glucose to
+                fructose-1,6-bisphosphate.
               </p>
 
               <div className="result-stats">
 
                 <div>
+
                   <strong>
                     {score}/{terms.length}
                   </strong>
@@ -1250,9 +1319,11 @@ function Level2({
                   <span>
                     Pathway
                   </span>
+
                 </div>
 
                 <div>
+
                   <strong>
                     {"❤️".repeat(lives)}
                   </strong>
@@ -1260,6 +1331,7 @@ function Level2({
                   <span>
                     Lives Remaining
                   </span>
+
                 </div>
 
               </div>
@@ -1273,30 +1345,34 @@ function Level2({
                 <ul>
 
                   <li>
-                    G3P is oxidized.
+                    Glucose starts glycolysis.
                   </li>
 
                   <li>
-                    NAD⁺ is reduced to NADH.
+                    Hexokinase catalyzes the
+                    first phosphorylation.
                   </li>
 
                   <li>
-                    ATP is produced by
-                    substrate-level phosphorylation.
+                    Glucose-6-phosphate is
+                    rearranged to
+                    fructose-6-phosphate.
                   </li>
 
                   <li>
-                    PEP is a high-energy
-                    intermediate.
+                    PFK-1 catalyzes the second
+                    phosphorylation.
                   </li>
 
                   <li>
-                    Glycolysis ends with pyruvate.
+                    Two ATP molecules are
+                    invested.
                   </li>
 
                   <li>
-                    The net gain is 2 ATP per
-                    glucose.
+                    Fructose-1,6-bisphosphate
+                    is formed at the end of
+                    this stage.
                   </li>
 
                 </ul>
@@ -1330,9 +1406,9 @@ function Level2({
               </h1>
 
               <p>
-                Don't worry. Go back through the
-                lesson and try the recall challenge
-                again.
+                Don't worry. Go back through
+                the lesson and try the recall
+                challenge again.
               </p>
 
               <div className="result-stats">
@@ -1411,12 +1487,13 @@ function Level2({
           </span>
 
           <h1>
-            Energy Payoff Flashcards
+            Glucose →
+            Fructose-1,6-bisphosphate
           </h1>
 
           <p>
-            Strengthen your memory before
-            continuing.
+            Review the energy-investment
+            phase before continuing.
           </p>
 
         </div>
