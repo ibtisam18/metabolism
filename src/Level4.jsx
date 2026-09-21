@@ -206,6 +206,9 @@ function Level4({
   const [placedTerms, setPlacedTerms] =
     useState({});
 
+  const [selectedTerm, setSelectedTerm] =
+    useState(null);
+
   const [shuffledTerms, setShuffledTerms] =
     useState(() => shuffleArray(terms));
 
@@ -479,43 +482,40 @@ function Level4({
     setLives(3);
     setScore(0);
     setPlacedTerms({});
+    setSelectedTerm(null);
     setDropFeedback(null);
+
     setShuffledTerms(
       shuffleArray(terms)
     );
   }
 
   // =====================================================
-  // DRAG START
+  // SELECT TERM — PHONE FRIENDLY
   // =====================================================
 
-  function handleDragStart(
-    event,
-    termId
-  ) {
+  function handleTermClick(termId) {
     if (lives <= 0) {
       return;
     }
 
-    event.dataTransfer.setData(
-      "termId",
-      termId
-    );
+    const alreadyPlaced =
+      Object.values(placedTerms).includes(
+        termId
+      );
 
-    event.dataTransfer.effectAllowed =
-      "move";
+    if (alreadyPlaced) {
+      return;
+    }
+
+    setSelectedTerm(termId);
   }
 
   // =====================================================
-  // DROP
+  // PLACE TERM
   // =====================================================
 
-  function handleDrop(
-    event,
-    index
-  ) {
-    event.preventDefault();
-
+  function placeTerm(termId, index) {
     if (lives <= 0) {
       return;
     }
@@ -523,11 +523,6 @@ function Level4({
     if (placedTerms[index]) {
       return;
     }
-
-    const termId =
-      event.dataTransfer.getData(
-        "termId"
-      );
 
     const term = terms.find(
       (item) =>
@@ -553,6 +548,7 @@ function Level4({
       const newScore = score + 1;
 
       setScore(newScore);
+      setSelectedTerm(null);
 
       setDropFeedback({
         type: "correct",
@@ -574,6 +570,7 @@ function Level4({
     const newLives = lives - 1;
 
     setLives(newLives);
+    setSelectedTerm(null);
 
     setDropFeedback({
       type: "wrong",
@@ -590,6 +587,71 @@ function Level4({
         setStage("result");
       }, 1000);
     }
+  }
+
+  // =====================================================
+  // TAP DROP — PHONE
+  // =====================================================
+
+  function handleTapDrop(index) {
+    if (!selectedTerm) {
+      return;
+    }
+
+    placeTerm(
+      selectedTerm,
+      index
+    );
+  }
+
+  // =====================================================
+  // DRAG START — DESKTOP
+  // =====================================================
+
+  function handleDragStart(
+    event,
+    termId
+  ) {
+    if (lives <= 0) {
+      return;
+    }
+
+    event.dataTransfer.setData(
+      "termId",
+      termId
+    );
+
+    event.dataTransfer.effectAllowed =
+      "move";
+  }
+
+  // =====================================================
+  // DROP — DESKTOP
+  // =====================================================
+
+  function handleDrop(
+    event,
+    index
+  ) {
+    event.preventDefault();
+
+    if (lives <= 0) {
+      return;
+    }
+
+    const termId =
+      event.dataTransfer.getData(
+        "termId"
+      );
+
+    if (!termId) {
+      return;
+    }
+
+    placeTerm(
+      termId,
+      index
+    );
   }
 
   // =====================================================
@@ -634,6 +696,7 @@ function Level4({
     setLives(3);
     setScore(0);
     setPlacedTerms({});
+    setSelectedTerm(null);
     setDropFeedback(null);
 
     setShuffledTerms(
@@ -804,8 +867,15 @@ function Level4({
           </h1>
 
           <p>
-            Drag each item into its correct
-            position.
+            <span className="desktop-only">
+              Drag each item into its correct
+              position.
+            </span>
+
+            <span className="mobile-only">
+              Tap an answer, then tap the
+              position where it belongs.
+            </span>
           </p>
 
           <div className="recall-stats">
@@ -854,7 +924,7 @@ function Level4({
         ================================================= */}
 
         <div
-          className="drag-game"
+          className="drag-game level4-drag-game"
           style={{
             width: "100%",
             height: "auto",
@@ -876,12 +946,17 @@ function Level4({
             }}
           >
             <h3>
-              Drag the Terms
+              Choose an Answer
             </h3>
 
             <p className="drag-instruction">
-              Answers are shuffled.
-              Think carefully.
+              <span className="desktop-only">
+                Drag the terms into the pathway.
+              </span>
+
+              <span className="mobile-only">
+                Tap an answer to select it.
+              </span>
             </p>
 
             <div className="terms">
@@ -894,17 +969,31 @@ function Level4({
                       term.id
                     );
 
+                  const isSelected =
+                    selectedTerm ===
+                    term.id;
+
                   return (
-                    <div
+                    <button
                       key={term.id}
+                      type="button"
                       className={`draggable-term ${
                         alreadyPlaced
                           ? "term-used"
+                          : ""
+                      } ${
+                        isSelected
+                          ? "term-selected"
                           : ""
                       }`}
                       draggable={
                         !alreadyPlaced &&
                         lives > 0
+                      }
+                      onClick={() =>
+                        handleTermClick(
+                          term.id
+                        )
                       }
                       onDragStart={(
                         event
@@ -914,13 +1003,17 @@ function Level4({
                           term.id
                         )
                       }
+                      disabled={
+                        alreadyPlaced ||
+                        lives <= 0
+                      }
                     >
                       <span className="drag-handle">
                         ⋮⋮
                       </span>
 
                       {term.label}
-                    </div>
+                    </button>
                   );
                 }
               )}
@@ -959,6 +1052,11 @@ function Level4({
                       placedId
                   );
 
+                const readyForTap =
+                  selectedTerm &&
+                  !placedTerm &&
+                  lives > 0;
+
                 return (
                   <div
                     className="pathway-row"
@@ -973,7 +1071,16 @@ function Level4({
                         placedTerm
                           ? "drop-zone-filled"
                           : ""
+                      } ${
+                        readyForTap
+                          ? "drop-zone-ready"
+                          : ""
                       }`}
+                      onClick={() =>
+                        handleTapDrop(
+                          index
+                        )
+                      }
                       onDragOver={
                         allowDrop
                       }
@@ -983,6 +1090,8 @@ function Level4({
                           index
                         )
                       }
+                      role="button"
+                      tabIndex={0}
                     >
                       {placedTerm ? (
                         <span className="placed-term">
@@ -990,7 +1099,9 @@ function Level4({
                         </span>
                       ) : (
                         <span className="drop-placeholder">
-                          Drop answer here
+                          {selectedTerm
+                            ? "Tap here to place"
+                            : "Drop answer here"}
                         </span>
                       )}
                     </div>
